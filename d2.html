@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exact Pixel Art Helmet</title>
+    <style>
+        body { background-color: black; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        canvas { border: 1px solid #fff; }
+    </style>
+</head>
+<body>
+    <canvas id="pixelCanvas" width="512" height="768"></canvas>
+    <script>
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const pixelSize = 1; // For exact pixel-by-pixel recreation
+        const gridWidth = canvas.width / pixelSize;
+        const gridHeight = canvas.height / pixelSize;
+
+        // Expanded colors based on image analysis
+        const colors = {
+            black: '#000000',
+            darkNavy: '#0a0a1e',
+            navy: '#1a1a3a',
+            deepBlue: '#002244',
+            blue: '#004488',
+            lightBlue: '#3399ff',
+            cyan: '#00ccff',
+            purple: '#6600cc',
+            darkOrange: '#993300',
+            orange: '#ff6600',
+            brightOrange: '#ff9933',
+            yellow: '#ffff00',
+            redOrange: '#cc3300'
+        };
+
+        // Grid for static pixels
+        let grid = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(colors.darkNavy));
+
+        // Function to draw pixel
+        function drawPixel(x, y, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+            grid[y][x] = color; // Update grid
+        }
+
+        // Add background noise/specks
+        function addBackgroundNoise() {
+            for (let y = 0; y < gridHeight; y++) {
+                for (let x = 0; x < gridWidth; x++) {
+                    if (Math.random() < 0.005) {
+                        grid[y][x] = colors.navy;
+                    } else if (Math.random() < 0.001) {
+                        grid[y][x] = colors.cyan;
+                    }
+                }
+            }
+        }
+
+        // Draw hexagonal border with gradient
+        function drawHexagonalBorder() {
+            // Top spike
+            drawPixel(256, 50, colors.yellow);
+            drawPixel(255, 60, colors.brightOrange);
+            drawPixel(257, 60, colors.brightOrange);
+            drawPixel(254, 70, colors.orange);
+            drawPixel(256, 70, colors.orange);
+            drawPixel(258, 70, colors.orange);
+            // Continue with slanted sides
+            // Left top slant
+            for (let i = 0; i < 100; i++) {
+                drawPixel(256 - i, 100 + i, colors.orange);
+                if (i % 10 === 0) drawPixel(255 - i, 100 + i, colors.brightOrange); // Glow
+            }
+            // Right top slant
+            for (let i = 0; i < 100; i++) {
+                drawPixel(256 + i, 100 + i, colors.orange);
+                if (i % 10 === 0) drawPixel(257 + i, 100 + i, colors.brightOrange);
+            }
+            // Left middle
+            for (let i = 0; i < 150; i++) {
+                drawPixel(156, 200 + i, colors.orange);
+                drawPixel(155, 200 + i, colors.darkOrange);
+            }
+            // Right middle
+            for (let i = 0; i < 150; i++) {
+                drawPixel(356, 200 + i, colors.orange);
+                drawPixel(357, 200 + i, colors.darkOrange);
+            }
+            // Left bottom slant
+            for (let i = 0; i < 100; i++) {
+                drawPixel(156 + i, 350 + i, colors.redOrange);
+                if (i % 5 === 0) drawPixel(155 + i, 350 + i, colors.orange);
+            }
+            // Right bottom slant
+            for (let i = 0; i < 100; i++) {
+                drawPixel(356 - i, 350 + i, colors.redOrange);
+                if (i % 5 === 0) drawPixel(357 - i, 350 + i, colors.orange);
+            }
+            // Add scattered glow pixels around border
+            drawPixel(250, 80, colors.yellow);
+            drawPixel(262, 80, colors.yellow);
+        }
+
+        // Draw helmet top with horn
+        function drawHelmetTop() {
+            // Horn
+            for (let i = 0; i < 50; i++) {
+                drawPixel(256, 100 + i, colors.blue);
+                drawPixel(255, 100 + i, colors.deepBlue);
+                drawPixel(257, 100 + i, colors.deepBlue);
+            }
+            // Curved top
+            for (let i = 0; i < 80; i++) {
+                drawPixel(256 - i, 150 + Math.floor(i / 4), colors.mediumBlue); // Left curve
+                drawPixel(256 + i, 150 + Math.floor(i / 4), colors.mediumBlue); // Right curve
+            }
+            // Add highlights
+            for (let i = 0; i < 20; i++) {
+                drawPixel(256, 120 + i, colors.lightBlue);
+            }
+        }
+
+        // Draw ears (side protrusions)
+        function drawEars() {
+            // Left ear
+            for (let y = 250; y < 300; y += 10) {
+                for (let x = 150; x < 170; x += 10) {
+                    drawPixel(x, y, colors.blue);
+                }
+            }
+            drawPixel(160, 260, colors.lightBlue); // Highlight
+            drawPixel(155, 270, colors.deepBlue); // Shadow
+            // Right ear
+            for (let y = 250; y < 300; y += 10) {
+                for (let x = 342; x < 362; x += 10) {
+                    drawPixel(x, y, colors.blue);
+                }
+            }
+            drawPixel(352, 260, colors.lightBlue);
+            drawPixel(357, 270, colors.deepBlue);
+        }
+
+        // Draw nose/visor
+        function drawNose() {
+            // Visor area
+            for (let y = 300; y < 350; y++) {
+                for (let x = 200; x < 312; x++) {
+                    drawPixel(x, y, colors.black);
+                    if ((x + y) % 20 === 0) drawPixel(x, y, colors.deepBlue); // Pattern
+                }
+            }
+            // Nose bridge
+            for (let i = 0; i < 20; i++) {
+                drawPixel(256, 320 + i, colors.mediumBlue);
+                drawPixel(255, 320 + i, colors.lightBlue);
+                drawPixel(257, 320 + i, colors.lightBlue);
+            }
+        }
+
+        // Draw helmet body with shades
+        function drawHelmetBody() {
+            // Fill the helmet area with varying blues and purples
+            for (let y = 150; y < 400; y++) {
+                for (let x = 156; x < 356; x++) {
+                    if (grid[y][x] === colors.darkNavy) {
+                        let shade = Math.random();
+                        if (shade < 0.3) grid[y][x] = colors.deepBlue;
+                        else if (shade < 0.6) grid[y][x] = colors.blue;
+                        else if (shade < 0.8) grid[y][x] = colors.mediumBlue;
+                        else grid[y][x] = colors.purple;
+                    }
+                }
+            }
+            // Add center highlights
+            for (let i = 0; i < 50; i++) {
+                drawPixel(256, 200 + i, colors.lightBlue);
+                if (i % 5 === 0) drawPixel(255, 200 + i, colors.cyan);
+                drawPixel(257, 200 + i, colors.cyan);
+            }
+        }
+
+        // Static drips for exact match, plus dynamic
+        function drawStaticDrips() {
+            // Example fixed drips from image
+            // Left side
+            drawPixel(180, 450, colors.cyan);
+            drawPixel(180, 460, colors.cyan);
+            drawPixel(180, 470, colors.blue);
+            drawPixel(185, 455, colors.lightBlue);
+            // Center
+            drawPixel(256, 450, colors.brightOrange);
+            drawPixel(256, 460, colors.orange);
+            drawPixel(256, 470, colors.orange);
+            drawPixel(256, 480, colors.darkOrange);
+            drawPixel(256, 490, colors.redOrange);
+            // Right
+            drawPixel(330, 450, colors.cyan);
+            drawPixel(330, 460, colors.cyan);
+            drawPixel(330, 470, colors.lightBlue);
+            drawPixel(330, 480, colors.blue);
+            // More scattered
+            for (let i = 0; i < 20; i++) {
+                let x = 200 + Math.floor(Math.random() * 112);
+                let y = 450 + Math.floor(Math.random() * 200);
+                let col = Math.random() > 0.5 ? colors.cyan : colors.brightOrange;
+                drawPixel(x, y, col);
+                if (Math.random() > 0.7) drawPixel(x, y + 10, col);
+            }
+        }
+
+        // Dynamic drips simulation
+        let drips = [];
+        function createDrip() {
+            drips.push({
+                x: 156 + Math.floor(Math.random() * 200), // From helmet bottom
+                y: 400,
+                color: Math.random() > 0.5 ? colors.cyan : colors.brightOrange,
+                speed: 0.05 + Math.random() * 0.15,
+                length: 1 + Math.floor(Math.random() * 5) // Trail length
+            });
+        }
+
+        function updateDrips() {
+            for (let i = drips.length - 1; i >= 0; i--) {
+                drips[i].y += drips[i].speed;
+                if (drips[i].y > gridHeight + drips[i].length) {
+                    drips.splice(i, 1);
+                }
+            }
+        }
+
+        function drawDrips() {
+            drips.forEach(drip => {
+                for (let t = 0; t < drip.length; t++) {
+                    let y = Math.floor(drip.y - t);
+                    if (y >= 0 && y < gridHeight) {
+                        drawPixel(drip.x, y, drip.color);
+                        // Fade trail
+                        if (t > 0) {
+                            ctx.globalAlpha = 1 - (t / drip.length);
+                            drawPixel(drip.x, y, drip.color);
+                            ctx.globalAlpha = 1;
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render everything
+        function render() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Draw grid
+            for (let y = 0; y < gridHeight; y++) {
+                for (let x = 0; x < gridWidth; x++) {
+                    ctx.fillStyle = grid[y][x];
+                    ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                }
+            }
+            // Draw dynamic drips
+            drawDrips();
+        }
+
+        // Animation loop
+        function animate() {
+            if (Math.random() < 0.05) createDrip(); // Create new drips randomly
+            updateDrips();
+            render();
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize
+        addBackgroundNoise();
+        drawHexagonalBorder();
+        drawHelmetTop();
+        drawEars();
+        drawNose();
+        drawHelmetBody();
+        drawStaticDrips(); // Add static for base image match
+        animate();
+    </script>
+</body>
+  </html>
