@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Helmet Simulation</title>
+    <style>
+        body { background-color: black; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        canvas { border: 1px solid #fff; }
+    </style>
+</head>
+<body>
+    <canvas id="pixelCanvas" width="400" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const pixelSize = 10;
+        const gridWidth = canvas.width / pixelSize;
+        const gridHeight = canvas.height / pixelSize;
+
+        // Colors
+        const colors = {
+            darkBg: '#000033',
+            orangeBorder: '#FF6600',
+            darkOrange: '#CC3300',
+            blueHelmet: '#003366',
+            lightBlue: '#3399FF',
+            mediumBlue: '#0066CC',
+            black: '#000000',
+            yellowSpike: '#FFFF00',
+            dripBlue: '#00CCFF',
+            dripOrange: '#FF9933'
+        };
+
+        // Initialize grid with background
+        let grid = Array.from({ length: gridHeight }, () => Array(gridWidth).fill(colors.darkBg));
+
+        // Function to draw a pixel
+        function drawPixel(x, y, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+        }
+
+        // Draw hexagonal frame
+        function drawHexagonalFrame() {
+            // Top point
+            grid[5][20] = colors.yellowSpike; // Top spike
+
+            // Hexagon borders (approximate pixels for hex shape)
+            // Top sides
+            for (let i = 0; i < 10; i++) {
+                grid[10 + i][10 - i] = colors.orangeBorder; // Left top slant
+                grid[10 + i][30 + i] = colors.orangeBorder; // Right top slant
+            }
+            // Bottom sides
+            for (let i = 0; i < 10; i++) {
+                grid[30 + i][i] = colors.orangeBorder; // Left bottom slant
+                grid[30 + i][40 - i] = colors.orangeBorder; // Right bottom slant
+            }
+            // Horizontal sides
+            for (let i = 0; i < 21; i++) {
+                grid[20][10 + i] = colors.orangeBorder; // Middle left to right
+                grid[40][i] = colors.orangeBorder; // Bottom left to right (adjust for hex)
+            }
+            // Adjust for proper hex
+            // Add glow effects
+            grid[6][19] = colors.darkOrange;
+            grid[6][21] = colors.darkOrange;
+        }
+
+        // Draw helmet top
+        function drawHelmetTop() {
+            // Spike on top
+            grid[8][20] = colors.yellowSpike;
+            grid[9][20] = colors.orangeBorder;
+            grid[10][20] = colors.orangeBorder;
+
+            // Helmet curve
+            for (let i = 0; i < 5; i++) {
+                grid[12 + i][18 - i] = colors.mediumBlue; // Left curve
+                grid[12 + i][22 + i] = colors.mediumBlue; // Right curve
+            }
+        }
+
+        // Draw ears (side protrusions)
+        function drawEars() {
+            // Left ear
+            grid[25][12] = colors.blueHelmet;
+            grid[26][12] = colors.lightBlue;
+            grid[27][12] = colors.blueHelmet;
+            // Right ear
+            grid[25][28] = colors.blueHelmet;
+            grid[26][28] = colors.lightBlue;
+            grid[27][28] = colors.blueHelmet;
+        }
+
+        // Draw nose/visor area
+        function drawNose() {
+            // Visor
+            for (let i = 0; i < 10; i++) {
+                grid[25][15 + i] = colors.black; // Dark visor
+            }
+            // Nose bridge
+            grid[28][20] = colors.mediumBlue;
+            grid[29][19] = colors.lightBlue;
+            grid[29][21] = colors.lightBlue;
+        }
+
+        // Draw main helmet body
+        function drawHelmetBody() {
+            // Fill inside hex with blue shades
+            for (let y = 15; y < 35; y++) {
+                for (let x = 5; x < 35; x++) {
+                    if (grid[y][x] === colors.darkBg) {
+                        grid[y][x] = Math.random() > 0.5 ? colors.blueHelmet : colors.mediumBlue;
+                    }
+                }
+            }
+            // Add details
+            grid[20][20] = colors.lightBlue; // Center highlight
+        }
+
+        // Drip particles for dynamic simulation
+        let drips = [];
+        function createDrip() {
+            drips.push({
+                x: Math.floor(Math.random() * gridWidth),
+                y: 40 + Math.floor(Math.random() * 5), // Start from bottom of helmet
+                color: Math.random() > 0.5 ? colors.dripBlue : colors.dripOrange,
+                speed: 0.1 + Math.random() * 0.2
+            });
+        }
+
+        // Update drips
+        function updateDrips() {
+            for (let i = drips.length - 1; i >= 0; i--) {
+                drips[i].y += drips[i].speed;
+                if (drips[i].y > gridHeight - 1) {
+                    drips.splice(i, 1);
+                }
+            }
+        }
+
+        // Render grid and drips
+        function render() {
+            // Draw static grid
+            for (let y = 0; y < gridHeight; y++) {
+                for (let x = 0; x < gridWidth; x++) {
+                    drawPixel(x, y, grid[y][x]);
+                }
+            }
+            // Draw dynamic drips
+            drips.forEach(drip => {
+                drawPixel(drip.x, Math.floor(drip.y), drip.color);
+                // Trail
+                if (Math.floor(drip.y) - 1 >= 0) {
+                    drawPixel(drip.x, Math.floor(drip.y) - 1, drip.color);
+                }
+            });
+        }
+
+        // Animation loop
+        function animate() {
+            if (Math.random() < 0.1) createDrip(); // Randomly create drips
+            updateDrips();
+            render();
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize
+        drawHexagonalFrame();
+        drawHelmetTop();
+        drawEars();
+        drawNose();
+        drawHelmetBody();
+        animate();
+    </script>
+</body>
+</html>
