@@ -338,37 +338,4 @@
             const breatheIntensity = Math.sin(breathePhase) * 0.02 + 1;
             canvas.style.transform = `scale(${breatheIntensity})`;
         }, 50);
-        
-        // Keyboard interactions
-        document.addEventListener('keydown', (e) => {
-            switch(e.key) {
-                case ' ': // Spacebar - energy burst
-                    const allPixels = document.querySelectorAll('.pixel:not(.star)');
-                    allPixels.forEach((pixel, index) => {
-                        setTimeout(() => {
-                            pixel.style.filter = 'brightness(2) saturate(2)';
-                            setTimeout(() => {
-                                pixel.style.filter = 'brightness(1) saturate(1)';
-                            }, 200);
-                        }, index * 2);
-                    });
-                    break;
-                    
-                case 'r': // R key - reset animations
-                    location.reload();
-                    break;
-                    
-                case 'f': // F key - flame intensity boost
-                    const flames = document.querySelectorAll('.flame-pixel');
-                    flames.forEach(flame => {
-                        flame.style.filter = 'brightness(2) hue-rotate(20deg) saturate(1.5)';
-                        setTimeout(() => {
-                            flame.style.filter = 'brightness(1) hue-rotate(0deg) saturate(1)';
-                        }, 1000);
-                    });
-                    break;
-            }
-        });
-    </script>
-</body>
-</html>
+        document.addEventListener('keydown', (e) => { switch(e.key) { case ' ': // Spacebar - energy burst const allPixels = document.querySelectorAll('.pixel:not(.star)'); allPixels.forEach((pixel, index) => { setTimeout(() => { pixel.style.filter = 'brightness(2) saturate(2)'; setTimeout(() => { pixel.style.filter = 'brightness(1) saturate(1)'; }, 200); }, index * 2); }); break; case 'r': // R key - reset animations location.reload(); break; case 'f': // F key - flame intensity boost const flames = document.querySelectorAll('.flame-pixel'); flames.forEach(flame => { flame.style.filter = 'brightness(2) hue-rotate(20deg) saturate(1.5)'; setTimeout(() => { flame.style.filter = 'brightness(1) hue-rotate(0deg) saturate(1)'; }, 1000); }); break; } });</script></body></html>
